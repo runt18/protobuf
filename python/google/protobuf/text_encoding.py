@@ -44,9 +44,9 @@ _cescape_utf8_to_str[34] = r'\"'  # necessary escape
 _cescape_utf8_to_str[92] = r'\\'  # necessary escape
 
 # Lookup table for non-utf8, with necessary escapes at (o >= 127 or o < 32)
-_cescape_byte_to_str = ([r'\%03o' % i for i in range(0, 32)] +
+_cescape_byte_to_str = ([r'\{0:03o}'.format(i) for i in range(0, 32)] +
                         [chr(i) for i in range(32, 127)] +
-                        [r'\%03o' % i for i in range(127, 256)])
+                        [r'\{0:03o}'.format(i) for i in range(127, 256)])
 _cescape_byte_to_str[9] = r'\t'  # optional escape
 _cescape_byte_to_str[10] = r'\n'  # optional escape
 _cescape_byte_to_str[13] = r'\r'  # optional escape
@@ -81,7 +81,7 @@ def CEscape(text, as_utf8):
 
 _CUNESCAPE_HEX = re.compile(r'(\\+)x([0-9a-fA-F])(?![0-9a-fA-F])')
 _cescape_highbit_to_str = ([chr(i) for i in range(0, 127)] +
-                           [r'\%03o' % i for i in range(127, 256)])
+                           [r'\{0:03o}'.format(i) for i in range(127, 256)])
 
 
 def CUnescape(text):

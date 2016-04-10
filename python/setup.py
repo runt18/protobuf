@@ -59,10 +59,10 @@ def generate_proto(source, require = True):
   if (not os.path.exists(output) or
       (os.path.exists(source) and
        os.path.getmtime(source) > os.path.getmtime(output))):
-    print("Generating %s..." % output)
+    print("Generating {0!s}...".format(output))
 
     if not os.path.exists(source):
-      sys.stderr.write("Can't find required file: %s\n" % source)
+      sys.stderr.write("Can't find required file: {0!s}\n".format(source))
       sys.exit(-1)
 
     if protoc is None:
@@ -140,7 +140,7 @@ class build_py(_build_py):
     # Make sure google.protobuf/** are valid packages.
     for path in ['', 'internal/', 'compiler/', 'pyext/', 'util/']:
       try:
-        open('google/protobuf/%s__init__.py' % path, 'a').close()
+        open('google/protobuf/{0!s}__init__.py'.format(path), 'a').close()
       except EnvironmentError:
         pass
     # _build_py is an old-style class, so super() doesn't work.
@@ -153,7 +153,7 @@ class test_conformance(_build_py):
       # Python 2.6 dodges these extra failures.
       os.environ["CONFORMANCE_PYTHON_EXTRA_FAILURES"] = (
           "--failure_list failure_list_python-post26.txt")
-    cmd = 'cd ../conformance && make %s' % (test_conformance.target)
+    cmd = 'cd ../conformance && make {0!s}'.format((test_conformance.target))
     status = subprocess.check_call(cmd, shell=True)
 
 

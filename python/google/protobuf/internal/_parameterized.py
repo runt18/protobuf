@@ -170,7 +170,7 @@ def _CleanRepr(obj):
 # Helper function formerly from the unittest module, removed from it in
 # Python 2.7.
 def _StrClass(cls):
-  return '%s.%s' % (cls.__module__, cls.__name__)
+  return '{0!s}.{1!s}'.format(cls.__module__, cls.__name__)
 
 
 def _NonStringIterable(obj):
@@ -180,7 +180,7 @@ def _NonStringIterable(obj):
 
 def _FormatParameterList(testcase_params):
   if isinstance(testcase_params, collections.Mapping):
-    return ', '.join('%s=%s' % (argname, _CleanRepr(value))
+    return ', '.join('{0!s}={1!s}'.format(argname, _CleanRepr(value))
                      for argname, value in testcase_params.items())
   elif _NonStringIterable(testcase_params):
     return ', '.join(map(_CleanRepr, testcase_params))
@@ -240,15 +240,15 @@ class _ParameterizedTestIter(object):
         # method of TestGeneratorMetaclass.
         # The metaclass will make sure to create a unique, but nondescriptive
         # name for this test.
-        BoundParamTest.__x_extra_id__ = '(%s)' % (
-            _FormatParameterList(testcase_params),)
+        BoundParamTest.__x_extra_id__ = '({0!s})'.format(
+            _FormatParameterList(testcase_params))
       else:
-        raise RuntimeError('%s is not a valid naming type.' % (naming_type,))
+        raise RuntimeError('{0!s} is not a valid naming type.'.format(naming_type))
 
-      BoundParamTest.__doc__ = '%s(%s)' % (
+      BoundParamTest.__doc__ = '{0!s}({1!s})'.format(
           BoundParamTest.__name__, _FormatParameterList(testcase_params))
       if test_method.__doc__:
-        BoundParamTest.__doc__ += '\n%s' % (test_method.__doc__,)
+        BoundParamTest.__doc__ += '\n{0!s}'.format(test_method.__doc__)
       return BoundParamTest
     return (MakeBoundParamTest(c) for c in self.testcases)
 
@@ -373,14 +373,14 @@ def _UpdateClassDictForParamTestCase(dct, id_suffix, name, iterator):
     iterator: The iterator generating the individual test cases.
   """
   for idx, func in enumerate(iterator):
-    assert callable(func), 'Test generators must yield callables, got %r' % (
-        func,)
+    assert callable(func), 'Test generators must yield callables, got {0!r}'.format(
+        func)
     if getattr(func, '__x_use_name__', False):
       new_name = func.__name__
     else:
-      new_name = '%s%s%d' % (name, _SEPARATOR, idx)
+      new_name = '{0!s}{1!s}{2:d}'.format(name, _SEPARATOR, idx)
     assert new_name not in dct, (
-        'Name of parameterized test case "%s" not unique' % (new_name,))
+        'Name of parameterized test case "{0!s}" not unique'.format(new_name))
     dct[new_name] = func
     id_suffix[new_name] = getattr(func, '__x_extra_id__', '')
 
@@ -393,7 +393,7 @@ class ParameterizedTestCase(unittest.TestCase):
     return self._testMethodName.split(_SEPARATOR)[0]
 
   def __str__(self):
-    return '%s (%s)' % (self._OriginalName(), _StrClass(self.__class__))
+    return '{0!s} ({1!s})'.format(self._OriginalName(), _StrClass(self.__class__))
 
   def id(self):  # pylint: disable=invalid-name
     """Returns the descriptive ID of the test.
@@ -404,7 +404,7 @@ class ParameterizedTestCase(unittest.TestCase):
     Returns:
       The test id.
     """
-    return '%s.%s%s' % (_StrClass(self.__class__),
+    return '{0!s}.{1!s}{2!s}'.format(_StrClass(self.__class__),
                         self._OriginalName(),
                         self._id_suffix.get(self._testMethodName, ''))
 

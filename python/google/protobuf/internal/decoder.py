@@ -469,7 +469,7 @@ def StringDecoder(field_number, is_repeated, is_packed, key, new_default):
       return local_unicode(byte_str, 'utf-8')
     except UnicodeDecodeError as e:
       # add more information to the error message and re-raise it.
-      e.reason = '%s in field: %s' % (e, key.full_name)
+      e.reason = '{0!s} in field: {1!s}'.format(e, key.full_name)
       raise
 
   assert not is_packed
