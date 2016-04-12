@@ -63,7 +63,7 @@ class DescriptorDatabase(object):
       self._file_desc_protos_by_file[proto_name] = file_desc_proto
     elif self._file_desc_protos_by_file[proto_name] != file_desc_proto:
       raise DescriptorDatabaseConflictingDefinitionError(
-          '%s already added, but with different descriptor.' % proto_name)
+          '{0!s} already added, but with different descriptor.'.format(proto_name))
 
     # Add the top-level Message, Enum and Extension descriptors to the index.
     package = file_desc_proto.package

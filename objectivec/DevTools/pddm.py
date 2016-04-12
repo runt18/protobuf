@@ -121,14 +121,14 @@ _GENERATED_CODE_LINE = (
 def _MacroRefRe(macro_names):
   # Takes in a list of macro names and makes a regex that will match invokes
   # of those macros.
-  return re.compile(r'\b(?P<macro_ref>(?P<name>(%s))\((?P<args>.*?)\))' %
-                    '|'.join(macro_names))
+  return re.compile(r'\b(?P<macro_ref>(?P<name>({0!s}))\((?P<args>.*?)\))'.format(
+                    '|'.join(macro_names)))
 
 def _MacroArgRefRe(macro_arg_names):
   # Takes in a list of macro arg names and makes a regex that will match
   # uses of those args.
-  return re.compile(r'\b(?P<name>(%s))(\$(?P<option>.))?\b' %
-                    '|'.join(macro_arg_names))
+  return re.compile(r'\b(?P<name>({0!s}))(\$(?P<option>.))?\b'.format(
+                    '|'.join(macro_arg_names)))
 
 
 class PDDMError(Exception):
@@ -208,7 +208,7 @@ class MacroCollection(object):
         if directive == 'PDDM-DEFINE':
           name, args = self._ParseDefineLine(line)
           if self._macros.get(name):
-            raise PDDMError('Attempt to redefine macro: "%s"' % line)
+            raise PDDMError('Attempt to redefine macro: "{0!s}"'.format(line))
           current_macro = self.MacroDefinition(name, args)
           self._macros[name] = current_macro
           continue
@@ -218,7 +218,7 @@ class MacroCollection(object):
                             ' "%s"' % line)
           current_macro = None
           continue
-        raise PDDMError('Hit a line with an unknown directive: "%s"' % line)
+        raise PDDMError('Hit a line with an unknown directive: "{0!s}"'.format(line))
 
       if current_macro:
         current_macro.AppendLine(line)
@@ -237,7 +237,7 @@ class MacroCollection(object):
     match = _MACRO_RE.match(line)
     # Must match full line
     if match is None or match.group(0) != line:
-      raise PDDMError('Failed to parse macro definition: "%s"' % input_line)
+      raise PDDMError('Failed to parse macro definition: "{0!s}"'.format(input_line))
     name = match.group('name')
     args_str = match.group('args').strip()
     args = []
@@ -245,11 +245,9 @@ class MacroCollection(object):
       for part in args_str.split(','):
         arg = part.strip()
         if arg == '':
-          raise PDDMError('Empty arg name in macro definition: "%s"'
-                          % input_line)
+          raise PDDMError('Empty arg name in macro definition: "{0!s}"'.format(input_line))
         if not _MACRO_ARG_NAME_RE.match(arg):
-          raise PDDMError('Invalid arg name "%s" in macro definition: "%s"'
-                          % (arg, input_line))
+          raise PDDMError('Invalid arg name "{0!s}" in macro definition: "{1!s}"'.format(arg, input_line))
         if arg in args:
           raise PDDMError('Arg name "%s" used more than once in macro'
                           ' definition: "%s"' % (arg, input_line))
@@ -270,15 +268,15 @@ class MacroCollection(object):
     """
     match = _MACRO_RE.match(macro_ref_str)
     if match is None or match.group(0) != macro_ref_str:
-      raise PDDMError('Failed to parse macro reference: "%s"' % macro_ref_str)
+      raise PDDMError('Failed to parse macro reference: "{0!s}"'.format(macro_ref_str))
     if match.group('name') not in self._macros:
-      raise PDDMError('No macro named "%s".' % match.group('name'))
+      raise PDDMError('No macro named "{0!s}".'.format(match.group('name')))
     return self._Expand(match, [], macro_ref_str)
 
   def _FormatStack(self, macro_ref_stack):
     result = ''
     for _, macro_ref in reversed(macro_ref_stack):
-      result += '\n...while expanding "%s".' % macro_ref
+      result += '\n...while expanding "{0!s}".'.format(macro_ref)
     return result
 
   def _Expand(self, macro_ref_match, macro_stack, macro_ref_str=None):
@@ -287,16 +285,14 @@ class MacroCollection(object):
     name = macro_ref_match.group('name')
     for prev_name, prev_macro_ref in macro_stack:
       if name == prev_name:
-        raise PDDMError('Found macro recusion, invoking "%s":%s' %
-                        (macro_ref_str, self._FormatStack(macro_stack)))
+        raise PDDMError('Found macro recusion, invoking "{0!s}":{1!s}'.format(macro_ref_str, self._FormatStack(macro_stack)))
     macro = self._macros[name]
     args_str = macro_ref_match.group('args').strip()
     args = []
     if args_str or len(macro.args):
       args = [x.strip() for x in args_str.split(',')]
     if len(args) != len(macro.args):
-      raise PDDMError('Expected %d args, got: "%s".%s' %
-                      (len(macro.args), macro_ref_str,
+      raise PDDMError('Expected {0:d} args, got: "{1!s}".{2!s}'.format(len(macro.args), macro_ref_str,
                        self._FormatStack(macro_stack)))
     # Replace args usages.
     result = self._ReplaceArgValues(macro, args, macro_ref_str, macro_stack)
@@ -339,8 +335,7 @@ class MacroCollection(object):
         elif opt == 'U': # All Uppercase
           return val.upper()
         else:
-          raise PDDMError('Unknown arg option "%s$%s" while expanding "%s".%s'
-                          % (match.group('name'), match.group('option'),
+          raise PDDMError('Unknown arg option "{0!s}${1!s}" while expanding "{2!s}".{3!s}'.format(match.group('name'), match.group('option'),
                              macro_ref_to_report,
                              self._FormatStack(macro_stack)))
       return val
@@ -457,14 +452,13 @@ class SourceFile(object):
         if directive == '//%PDDM-EXPAND-END':
           assert self.num_lines_captured > 0
           return (True, False)
-        raise PDDMError('Ran into directive ("%s", line %d) while in "%s".' %
-                        (directive, line_num, self.first_line))
+        raise PDDMError('Ran into directive ("{0!s}", line {1:d}) while in "{2!s}".'.format(directive, line_num, self.first_line))
       # Eat other lines.
       return (True, True)
 
     def HitEOF(self):
-      raise PDDMError('Hit the end of the file while in "%s".' %
-                      self.first_line)
+      raise PDDMError('Hit the end of the file while in "{0!s}".'.format(
+                      self.first_line))
 
     def BindMacroCollection(self, macro_collection):
       self._macro_collection = macro_collection
@@ -495,10 +489,10 @@ class SourceFile(object):
 
       # Add the ending marker.
       if len(captured_lines) == 1:
-        result.append('//%%PDDM-EXPAND-END %s' %
-                       captured_lines[0][directive_len:].strip())
+        result.append('//%PDDM-EXPAND-END {0!s}'.format(
+                       captured_lines[0][directive_len:].strip()))
       else:
-        result.append('//%%PDDM-EXPAND-END (%s expansions)' % len(captured_lines))
+        result.append('//%PDDM-EXPAND-END ({0!s} expansions)'.format(len(captured_lines)))
 
       return result
 
@@ -513,8 +507,7 @@ class SourceFile(object):
         if directive == "//%PDDM-EXPAND":
           return False, False
         if directive not in ('//%PDDM-DEFINE', '//%PDDM-DEFINE-END'):
-          raise PDDMError('Ran into directive ("%s", line %d) while in "%s".' %
-                          (directive, line_num, self.first_line))
+          raise PDDMError('Ran into directive ("{0!s}", line {1:d}) while in "{2!s}".'.format(directive, line_num, self.first_line))
       self.Append(line)
       return (True, True)
 
@@ -594,7 +587,7 @@ class SourceFile(object):
       elif directive == '//%PDDM-IMPORT-DEFINES':
         section = self.ImportDefinesSection(line_num, self._import_resolver)
       else:
-        raise PDDMError('Unexpected line %d: "%s".' % (line_num, line))
+        raise PDDMError('Unexpected line {0:d}: "{1!s}".'.format(line_num, line))
     self._sections.append(section)
     return section
 
@@ -646,7 +639,7 @@ def main(args):
   result = 0
   for a_path in extra_args:
     if not os.path.exists(a_path):
-      sys.stderr.write('ERROR: File not found: %s\n' % a_path)
+      sys.stderr.write('ERROR: File not found: {0!s}\n'.format(a_path))
       return 100
 
     def _ImportResolver(name):
@@ -663,21 +656,20 @@ def main(args):
     try:
       src_file.ProcessContent(strip_expansion=opts.collapse)
     except PDDMError as e:
-      sys.stderr.write('ERROR: %s\n...While processing "%s"\n' %
-                       (e.message, a_path))
+      sys.stderr.write('ERROR: {0!s}\n...While processing "{1!s}"\n'.format(e.message, a_path))
       return 101
 
     if src_file.processed_content != src_file.original_content:
       if not opts.dry_run:
-        print 'Updating for "%s".' % a_path
+        print 'Updating for "{0!s}".'.format(a_path)
         with open(a_path, 'w') as f:
           f.write(src_file.processed_content)
       else:
         # Special result to indicate things need updating.
-        print 'Update needed for "%s".' % a_path
+        print 'Update needed for "{0!s}".'.format(a_path)
         result = 1
     elif opts.verbose:
-      print 'No update for "%s".' % a_path
+      print 'No update for "{0!s}".'.format(a_path)
 
   return result
 

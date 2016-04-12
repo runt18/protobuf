@@ -225,14 +225,14 @@ def PrintFieldValue(field, value, out, indent=0, as_utf8=False,
 
   if field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_MESSAGE:
     if as_one_line:
-      out.write(' %s ' % openb)
+      out.write(' {0!s} '.format(openb))
       PrintMessage(value, out, indent, as_utf8, as_one_line,
                    pointy_brackets=pointy_brackets,
                    use_index_order=use_index_order,
                    float_format=float_format)
       out.write(closeb)
     else:
-      out.write(' %s\n' % openb)
+      out.write(' {0!s}\n'.format(openb))
       PrintMessage(value, out, indent + 2, as_utf8, as_one_line,
                    pointy_brackets=pointy_brackets,
                    use_index_order=use_index_order,
@@ -403,8 +403,8 @@ def _MergeField(tokenizer,
 
     if not message_descriptor.is_extendable:
       raise tokenizer.ParseErrorPreviousToken(
-          'Message type "%s" does not have extensions.' %
-          message_descriptor.full_name)
+          'Message type "{0!s}" does not have extensions.'.format(
+          message_descriptor.full_name))
     # pylint: disable=protected-access
     field = message.Extensions._FindExtensionByName(name)
     # pylint: enable=protected-access
@@ -413,10 +413,10 @@ def _MergeField(tokenizer,
         field = None
       else:
         raise tokenizer.ParseErrorPreviousToken(
-            'Extension "%s" not registered.' % name)
+            'Extension "{0!s}" not registered.'.format(name))
     elif message_descriptor != field.containing_type:
       raise tokenizer.ParseErrorPreviousToken(
-          'Extension "%s" does not extend message type "%s".' % (
+          'Extension "{0!s}" does not extend message type "{1!s}".'.format(
               name, message_descriptor.full_name))
 
     tokenizer.Consume(']')
@@ -439,7 +439,7 @@ def _MergeField(tokenizer,
 
     if not field:
       raise tokenizer.ParseErrorPreviousToken(
-          'Message type "%s" has no field named "%s".' % (
+          'Message type "{0!s}" has no field named "{1!s}".'.format(
               message_descriptor.full_name, name))
 
   if field and field.cpp_type == descriptor.FieldDescriptor.CPPTYPE_MESSAGE:
@@ -468,7 +468,7 @@ def _MergeField(tokenizer,
 
     while not tokenizer.TryConsume(end_token):
       if tokenizer.AtEnd():
-        raise tokenizer.ParseErrorPreviousToken('Expected "%s".' % (end_token))
+        raise tokenizer.ParseErrorPreviousToken('Expected "{0!s}".'.format((end_token)))
       _MergeField(tokenizer, sub_message, allow_multiple_scalars,
                   allow_unknown_extension)
 
@@ -628,7 +628,7 @@ def _MergeScalarField(tokenizer, message, field, allow_multiple_scalars):
   elif field.type == descriptor.FieldDescriptor.TYPE_ENUM:
     value = tokenizer.ConsumeEnum(field)
   else:
-    raise RuntimeError('Unknown field type %d' % field.type)
+    raise RuntimeError('Unknown field type {0:d}'.format(field.type))
 
   if field.label == descriptor.FieldDescriptor.LABEL_REPEATED:
     if field.is_extension:
@@ -639,15 +639,13 @@ def _MergeScalarField(tokenizer, message, field, allow_multiple_scalars):
     if field.is_extension:
       if not allow_multiple_scalars and message.HasExtension(field):
         raise tokenizer.ParseErrorPreviousToken(
-            'Message type "%s" should not have multiple "%s" extensions.' %
-            (message.DESCRIPTOR.full_name, field.full_name))
+            'Message type "{0!s}" should not have multiple "{1!s}" extensions.'.format(message.DESCRIPTOR.full_name, field.full_name))
       else:
         message.Extensions[field] = value
     else:
       if not allow_multiple_scalars and message.HasField(field.name):
         raise tokenizer.ParseErrorPreviousToken(
-            'Message type "%s" should not have multiple "%s" fields.' %
-            (message.DESCRIPTOR.full_name, field.name))
+            'Message type "{0!s}" should not have multiple "{1!s}" fields.'.format(message.DESCRIPTOR.full_name, field.name))
       else:
         setattr(message, field.name, value)
 
@@ -741,7 +739,7 @@ class _Tokenizer(object):
       ParseError: If the text couldn't be consumed.
     """
     if not self.TryConsume(token):
-      raise self._ParseError('Expected "%s".' % token)
+      raise self._ParseError('Expected "{0!s}".'.format(token))
 
   def TryConsumeIdentifier(self):
     try:
@@ -932,10 +930,10 @@ class _Tokenizer(object):
     """
     text = self.token
     if len(text) < 1 or text[0] not in _QUOTES:
-      raise self._ParseError('Expected string but found: %r' % (text,))
+      raise self._ParseError('Expected string but found: {0!r}'.format(text))
 
     if len(text) < 2 or text[-1] != text[0]:
-      raise self._ParseError('String missing ending quote: %r' % (text,))
+      raise self._ParseError('String missing ending quote: {0!r}'.format(text))
 
     try:
       result = text_encoding.CUnescape(text[1:-1])
@@ -961,12 +959,12 @@ class _Tokenizer(object):
     Returns:
       A ParseError instance.
     """
-    return ParseError('%d:%d : %s' % (
+    return ParseError('{0:d}:{1:d} : {2!s}'.format(
         self._previous_line + 1, self._previous_column + 1, message))
 
   def _ParseError(self, message):
     """Creates and *returns* a ParseError for the current token."""
-    return ParseError('%d:%d : %s' % (
+    return ParseError('{0:d}:{1:d} : {2!s}'.format(
         self._line + 1, self._column + 1, message))
 
   def _StringParseError(self, e):
@@ -1016,7 +1014,7 @@ def ParseInteger(text, is_signed=False, is_long=False):
     else:
       result = int(text, 0)
   except ValueError:
-    raise ValueError('Couldn\'t parse integer: %s' % text)
+    raise ValueError('Couldn\'t parse integer: {0!s}'.format(text))
 
   # Check if the integer is sane. Exceptions handled by callers.
   checker = _INTEGER_CHECKERS[2 * int(is_long) + int(is_signed)]
@@ -1053,7 +1051,7 @@ def ParseFloat(text):
       try:
         return float(text.rstrip('f'))
       except ValueError:
-        raise ValueError('Couldn\'t parse float: %s' % text)
+        raise ValueError('Couldn\'t parse float: {0!s}'.format(text))
 
 
 def ParseBool(text):
@@ -1100,13 +1098,13 @@ def ParseEnum(field, value):
     enum_value = enum_descriptor.values_by_name.get(value, None)
     if enum_value is None:
       raise ValueError(
-          'Enum type "%s" has no value named %s.' % (
+          'Enum type "{0!s}" has no value named {1!s}.'.format(
               enum_descriptor.full_name, value))
   else:
     # Numeric value.
     enum_value = enum_descriptor.values_by_number.get(number, None)
     if enum_value is None:
       raise ValueError(
-          'Enum type "%s" has no value with number %d.' % (
+          'Enum type "{0!s}" has no value with number {1:d}.'.format(
               enum_descriptor.full_name, number))
   return enum_value.number

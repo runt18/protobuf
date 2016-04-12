@@ -202,7 +202,7 @@ class DescriptorPool(object):
       else:
         raise error
     if not file_proto:
-      raise KeyError('Cannot find a file named %s' % file_name)
+      raise KeyError('Cannot find a file named {0!s}'.format(file_name))
     return self._ConvertFileProtoToFileDescriptor(file_proto)
 
   def FindFileContainingSymbol(self, symbol):
@@ -237,7 +237,7 @@ class DescriptorPool(object):
       else:
         raise error
     if not file_proto:
-      raise KeyError('Cannot find a file containing %s' % symbol)
+      raise KeyError('Cannot find a file containing {0!s}'.format(symbol))
     return self._ConvertFileProtoToFileDescriptor(file_proto)
 
   def FindMessageTypeByName(self, full_name):
@@ -511,7 +511,7 @@ class DescriptorPool(object):
                                      values=values,
                                      containing_type=containing_type,
                                      options=enum_proto.options)
-    scope['.%s' % enum_name] = desc
+    scope['.{0!s}'.format(enum_name)] = desc
     self._enum_descriptors[enum_name] = desc
     return desc
 
@@ -733,7 +733,7 @@ class DescriptorPool(object):
 
 
 def _PrefixWithDot(name):
-  return name if name.startswith('.') else '.%s' % name
+  return name if name.startswith('.') else '.{0!s}'.format(name)
 
 
 if _USE_C_DESCRIPTORS:

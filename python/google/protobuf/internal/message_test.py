@@ -1680,7 +1680,7 @@ class Proto3Test(unittest.TestCase):
     # Packs to Any.
     msg.value.Pack(all_types)
     self.assertEqual(msg.value.type_url,
-                     'type.googleapis.com/%s' % all_descriptor.full_name)
+                     'type.googleapis.com/{0!s}'.format(all_descriptor.full_name))
     self.assertEqual(msg.value.value,
                      all_types.SerializeToString())
     # Tests Is() method.
@@ -1698,8 +1698,8 @@ class Proto3Test(unittest.TestCase):
     except AttributeError:
       pass
     else:
-      raise AttributeError('%s should not have Pack method.' %
-                           msg_descriptor.full_name)
+      raise AttributeError('{0!s} should not have Pack method.'.format(
+                           msg_descriptor.full_name))
 
 
 
@@ -1708,10 +1708,10 @@ class ValidTypeNamesTest(unittest.TestCase):
   def assertImportFromName(self, msg, base_name):
     # Parse <type 'module.class_name'> to extra 'some.name' as a string.
     tp_name = str(type(msg)).split("'")[1]
-    valid_names = ('Repeated%sContainer' % base_name,
-                   'Repeated%sFieldContainer' % base_name)
+    valid_names = ('Repeated{0!s}Container'.format(base_name),
+                   'Repeated{0!s}FieldContainer'.format(base_name))
     self.assertTrue(any(tp_name.endswith(v) for v in valid_names),
-                    '%r does end with any of %r' % (tp_name, valid_names))
+                    '{0!r} does end with any of {1!r}'.format(tp_name, valid_names))
 
     parts = tp_name.split('.')
     class_name = parts[-1]

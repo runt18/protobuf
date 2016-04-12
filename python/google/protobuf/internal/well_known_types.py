@@ -69,9 +69,9 @@ class Any(object):
   def Pack(self, msg, type_url_prefix='type.googleapis.com/'):
     """Packs the specified message into current Any message."""
     if len(type_url_prefix) < 1 or type_url_prefix[-1] != '/':
-      self.type_url = '%s/%s' % (type_url_prefix, msg.DESCRIPTOR.full_name)
+      self.type_url = '{0!s}/{1!s}'.format(type_url_prefix, msg.DESCRIPTOR.full_name)
     else:
-      self.type_url = '%s%s' % (type_url_prefix, msg.DESCRIPTOR.full_name)
+      self.type_url = '{0!s}{1!s}'.format(type_url_prefix, msg.DESCRIPTOR.full_name)
     self.value = msg.SerializeToString()
 
   def Unpack(self, msg):
@@ -112,12 +112,12 @@ class Timestamp(object):
       return result + 'Z'
     if (nanos % 1e6) == 0:
       # Serialize 3 fractional digits.
-      return result + '.%03dZ' % (nanos / 1e6)
+      return result + '.{0:03d}Z'.format((nanos / 1e6))
     if (nanos % 1e3) == 0:
       # Serialize 6 fractional digits.
-      return result + '.%06dZ' % (nanos / 1e3)
+      return result + '.{0:06d}Z'.format((nanos / 1e3))
     # Serialize 9 fractional digits.
-    return result + '.%09dZ' % nanos
+    return result + '.{0:09d}Z'.format(nanos)
 
   def FromJsonString(self, value):
     """Parse a RFC 3339 date string format to Timestamp.
@@ -251,19 +251,19 @@ class Duration(object):
       result = ''
       seconds = self.seconds + int(self.nanos // 1e9)
       nanos = self.nanos % 1e9
-    result += '%d' % seconds
+    result += '{0:d}'.format(seconds)
     if (nanos % 1e9) == 0:
       # If there are 0 fractional digits, the fractional
       # point '.' should be omitted when serializing.
       return result + 's'
     if (nanos % 1e6) == 0:
       # Serialize 3 fractional digits.
-      return result + '.%03ds' % (nanos / 1e6)
+      return result + '.{0:03d}s'.format((nanos / 1e6))
     if (nanos % 1e3) == 0:
       # Serialize 6 fractional digits.
-      return result + '.%06ds' % (nanos / 1e3)
+      return result + '.{0:06d}s'.format((nanos / 1e3))
     # Serialize 9 fractional digits.
-    return result + '.%09ds' % nanos
+    return result + '.{0:09d}s'.format(nanos)
 
   def FromJsonString(self, value):
     """Converts a string to Duration.

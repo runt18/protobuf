@@ -119,10 +119,10 @@ body2""")
       f = io.StringIO(input_str)
       try:
         result = pddm.MacroCollection(f)
-        self.fail('Should throw exception, entry %d' % idx)
+        self.fail('Should throw exception, entry {0:d}'.format(idx))
       except pddm.PDDMError as e:
         self.assertTrue(e.message.startswith(expected_prefix),
-                        'Entry %d failed: %r' % (idx, e))
+                        'Entry {0:d} failed: {1!r}'.format(idx, e))
 
   def testParseBeginIssues(self):
     test_list = [
@@ -174,10 +174,10 @@ body2""")
       f = io.StringIO(input_str)
       try:
         result = pddm.MacroCollection(f)
-        self.fail('Should throw exception, entry %d' % idx)
+        self.fail('Should throw exception, entry {0:d}'.format(idx))
       except pddm.PDDMError as e:
         self.assertTrue(e.message.startswith(expected_prefix),
-                        'Entry %d failed: %r' % (idx, e))
+                        'Entry {0:d} failed: {1!r}'.format(idx, e))
 
 
 class TestExpandingMacros(unittest.TestCase):
@@ -223,8 +223,7 @@ PDDM-DEFINE-END
     for idx, (input_str, expected) in enumerate(test_list, 1):
       result = mc.Expand(input_str)
       self.assertEqual(result, expected,
-                       'Entry %d --\n       Result: %r\n     Expected: %r' %
-                       (idx, result, expected))
+                       'Entry {0:d} --\n       Result: {1!r}\n     Expected: {2!r}'.format(idx, result, expected))
 
   def testExpandArgOptions(self):
     f = io.StringIO(u"""
@@ -267,10 +266,10 @@ a - a$z
     for idx, (input_str, expected_err) in enumerate(test_list, 1):
       try:
         result = mc.Expand(input_str)
-        self.fail('Should throw exception, entry %d' % idx)
+        self.fail('Should throw exception, entry {0:d}'.format(idx))
       except pddm.PDDMError as e:
         self.assertEqual(e.message, expected_err,
-                        'Entry %d failed: %r' % (idx, e))
+                        'Entry {0:d} failed: {1!r}'.format(idx, e))
 
   def testExpandReferences(self):
     f = io.StringIO(u"""
@@ -311,7 +310,7 @@ foo(x, y)
     mc = pddm.MacroCollection(f)
     try:
       result = mc.Expand('foo(A,B)')
-      self.fail('Should throw exception, entry %d' % idx)
+      self.fail('Should throw exception, entry {0:d}'.format(idx))
     except pddm.PDDMError as e:
       self.assertEqual(e.message,
                        'Found macro recusion, invoking "foo(1, A)":\n...while expanding "bar(1, A)".\n...while expanding "foo(A,B)".')
@@ -352,12 +351,10 @@ class TestParsingSource(unittest.TestCase):
       sf = pddm.SourceFile(f)
       sf._ParseFile()
       self.assertEqual(len(sf._sections), len(line_counts),
-                       'Entry %d -- %d != %d' %
-                       (idx, len(sf._sections), len(line_counts)))
+                       'Entry {0:d} -- {1:d} != {2:d}'.format(idx, len(sf._sections), len(line_counts)))
       for idx2, (sec, expected) in enumerate(zip(sf._sections, line_counts), 1):
         self.assertEqual(sec.num_lines_captured, expected,
-                         'Entry %d, section %d -- %d != %d' %
-                         (idx, idx2, sec.num_lines_captured, expected))
+                         'Entry {0:d}, section {1:d} -- {2:d} != {3:d}'.format(idx, idx2, sec.num_lines_captured, expected))
 
   def testErrors(self):
     test_list = [
@@ -386,10 +383,10 @@ class TestParsingSource(unittest.TestCase):
       f = io.StringIO(input_str)
       try:
         pddm.SourceFile(f)._ParseFile()
-        self.fail('Should throw exception, entry %d' % idx)
+        self.fail('Should throw exception, entry {0:d}'.format(idx))
       except pddm.PDDMError as e:
         self.assertEqual(e.message, expected_err,
-                        'Entry %d failed: %r' % (idx, e))
+                        'Entry {0:d} failed: {1!r}'.format(idx, e))
 
 class TestProcessingSource(unittest.TestCase):
 
@@ -483,7 +480,7 @@ foo
     sf = pddm.SourceFile(f)
     try:
       sf.ProcessContent()
-      self.fail('Should throw exception, entry %d' % idx)
+      self.fail('Should throw exception, entry {0:d}'.format(idx))
     except pddm.PDDMError as e:
       self.assertEqual(e.message,
                        'Attempt to redefine macro: "PDDM-DEFINE mumble(x_)"\n'
@@ -503,7 +500,7 @@ foo
     sf = pddm.SourceFile(f)
     try:
       sf.ProcessContent()
-      self.fail('Should throw exception, entry %d' % idx)
+      self.fail('Should throw exception, entry {0:d}'.format(idx))
     except pddm.PDDMError as e:
       self.assertEqual(e.message,
                        'No macro named "foobar".\n'

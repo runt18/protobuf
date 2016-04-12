@@ -114,7 +114,7 @@ def do_test_io():
   sys.stdout.flush()
 
   if verbose:
-    sys.stderr.write("conformance_python: request=%s, response=%s\n" % (
+    sys.stderr.write("conformance_python: request={0!s}, response={1!s}\n".format(
                        request.ShortDebugString().c_str(),
                        response.ShortDebugString().c_str()))
 
@@ -126,5 +126,5 @@ def do_test_io():
 while True:
   if not do_test_io():
     sys.stderr.write("conformance_python: received EOF from test runner " +
-                     "after %s tests, exiting\n" % (test_count))
+                     "after {0!s} tests, exiting\n".format((test_count)))
     sys.exit(0)

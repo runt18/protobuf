@@ -200,7 +200,7 @@ class TextFormatTest(TextFormatBase):
     r = text_format.Parse(wire_text, parsed_message)
     self.assertIs(r, parsed_message)
     self.assertEqual(message, parsed_message,
-                      '\n%s != %s' % (message, parsed_message))
+                      '\n{0!s} != {1!s}'.format(message, parsed_message))
 
   def testPrintRawUtf8String(self, message_module):
     message = message_module.TestAllTypes()
@@ -210,7 +210,7 @@ class TextFormatTest(TextFormatBase):
     parsed_message = message_module.TestAllTypes()
     text_format.Parse(text, parsed_message)
     self.assertEqual(message, parsed_message,
-                      '\n%s != %s' % (message, parsed_message))
+                      '\n{0!s} != {1!s}'.format(message, parsed_message))
 
   def testPrintFloatFormat(self, message_module):
     # Check that float_format argument is passed to sub-message formatting.
@@ -986,7 +986,7 @@ class TokenizerTest(unittest.TestCase):
     # as the '0' special cases.
     int64_max = (1 << 63) - 1
     uint32_max = (1 << 32) - 1
-    text = '-1 %d %d' % (uint32_max + 1, int64_max + 1)
+    text = '-1 {0:d} {1:d}'.format(uint32_max + 1, int64_max + 1)
     tokenizer = text_format._Tokenizer(text.splitlines())
     self.assertRaises(text_format.ParseError, tokenizer.ConsumeUint32)
     self.assertRaises(text_format.ParseError, tokenizer.ConsumeUint64)

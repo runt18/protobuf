@@ -1652,8 +1652,8 @@ class ReflectionTest(unittest.TestCase):
           another_file_name,
           package_name,
           serialized_pb=file_descriptor_proto.SerializeToString())
-      self.assertTrue(hasattr(cm, 'exception'), '%s not raised' %
-                      getattr(cm.expected, '__name__', cm.expected))
+      self.assertTrue(hasattr(cm, 'exception'), '{0!s} not raised'.format(
+                      getattr(cm.expected, '__name__', cm.expected)))
       self.assertIn('test_file_descriptor_errors.proto', str(cm.exception))
       # Error message will say something about this definition being a
       # duplicate, though we don't check the message exactly to avoid a
@@ -2519,7 +2519,7 @@ class SerializationTest(unittest.TestCase):
       self.assertEqual(exception, str(ex))
       return
     else:
-      raise self.failureException('%s not raised' % str(exc_class))
+      raise self.failureException('{0!s} not raised'.format(str(exc_class)))
 
   def testSerializeUninitialized(self):
     proto = unittest_pb2.TestRequired()

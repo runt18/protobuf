@@ -223,15 +223,14 @@ def _VerifyExtensionHandle(message, extension_handle):
   """Verify that the given extension handle is valid."""
 
   if not isinstance(extension_handle, _FieldDescriptor):
-    raise KeyError('HasExtension() expects an extension handle, got: %s' %
-                   extension_handle)
+    raise KeyError('HasExtension() expects an extension handle, got: {0!s}'.format(
+                   extension_handle))
 
   if not extension_handle.is_extension:
-    raise KeyError('"%s" is not an extension.' % extension_handle.full_name)
+    raise KeyError('"{0!s}" is not an extension.'.format(extension_handle.full_name))
 
   if not extension_handle.containing_type:
-    raise KeyError('"%s" is missing a containing_type.'
-                   % extension_handle.full_name)
+    raise KeyError('"{0!s}" is missing a containing_type.'.format(extension_handle.full_name))
 
   if extension_handle.containing_type is not message.DESCRIPTOR:
     raise KeyError('Extension "%s" extends message type "%s", but this '
@@ -369,8 +368,8 @@ def _AddEnumValues(descriptor, cls):
 
 def _GetInitializeDefaultForMap(field):
   if field.label != _FieldDescriptor.LABEL_REPEATED:
-    raise ValueError('map_entry set on non-repeated field %s' % (
-        field.name))
+    raise ValueError('map_entry set on non-repeated field {0!s}'.format((
+        field.name)))
   fields_by_name = field.message_type.fields_by_name
   key_checker = type_checkers.GetTypeChecker(fields_by_name['key'])
 
@@ -406,8 +405,8 @@ def _DefaultValueConstructorForField(field):
 
   if field.label == _FieldDescriptor.LABEL_REPEATED:
     if field.has_default_value and field.default_value != []:
-      raise ValueError('Repeated field default value not empty list: %s' % (
-          field.default_value))
+      raise ValueError('Repeated field default value not empty list: {0!s}'.format((
+          field.default_value)))
     if field.cpp_type == _FieldDescriptor.CPPTYPE_MESSAGE:
       # We can't look at _concrete_class yet since it might not have
       # been set.  (Depends on order in which we initialize the classes).
@@ -447,7 +446,7 @@ def _ReraiseTypeErrorWithFieldName(message_name, field_name):
   exc = sys.exc_info()[1]
   if len(exc.args) == 1 and type(exc) is TypeError:
     # simple TypeError; add field name to exception message
-    exc = TypeError('%s for field %s.%s' % (str(exc), message_name, field_name))
+    exc = TypeError('{0!s} for field {1!s}.{2!s}'.format(str(exc), message_name, field_name))
 
   # re-raise possibly-amended exception with original traceback:
   six.reraise(type(exc), exc, sys.exc_info()[2])
@@ -467,7 +466,7 @@ def _AddInitMethod(message_descriptor, cls):
       try:
         return enum_type.values_by_name[value].number
       except KeyError:
-        raise ValueError('Enum type %s: unknown label "%s"' % (
+        raise ValueError('Enum type {0!s}: unknown label "{1!s}"'.format(
             enum_type.full_name, value))
     return value
 
@@ -488,8 +487,7 @@ def _AddInitMethod(message_descriptor, cls):
     for field_name, field_value in kwargs.items():
       field = _GetFieldByName(message_descriptor, field_name)
       if field is None:
-        raise TypeError("%s() got an unexpected keyword argument '%s'" %
-                        (message_descriptor.name, field_name))
+        raise TypeError("{0!s}() got an unexpected keyword argument '{1!s}'".format(message_descriptor.name, field_name))
       if field.label == _FieldDescriptor.LABEL_REPEATED:
         copy = field._default_constructor(self)
         if field.cpp_type == _FieldDescriptor.CPPTYPE_MESSAGE:  # Composite
@@ -546,8 +544,7 @@ def _GetFieldByName(message_descriptor, field_name):
   try:
     return message_descriptor.fields_by_name[field_name]
   except KeyError:
-    raise ValueError('Protocol message %s has no "%s" field.' %
-                     (message_descriptor.name, field_name))
+    raise ValueError('Protocol message {0!s} has no "{1!s}" field.'.format(message_descriptor.name, field_name))
 
 
 def _AddPropertiesForFields(descriptor, cls):
@@ -618,7 +615,7 @@ def _AddPropertiesForRepeatedField(field, cls):
       field_value = self._fields.setdefault(field, field_value)
     return field_value
   getter.__module__ = None
-  getter.__doc__ = 'Getter for %s.' % proto_field_name
+  getter.__doc__ = 'Getter for {0!s}.'.format(proto_field_name)
 
   # We define a setter just so we can throw an exception with a more
   # helpful error message.
@@ -626,7 +623,7 @@ def _AddPropertiesForRepeatedField(field, cls):
     raise AttributeError('Assignment not allowed to repeated field '
                          '"%s" in protocol message object.' % proto_field_name)
 
-  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "{0!s}" proto field.'.format(proto_field_name)
   setattr(cls, property_name, property(getter, setter, doc=doc))
 
 
@@ -653,7 +650,7 @@ def _AddPropertiesForNonRepeatedScalarField(field, cls):
     # default_value.  Combine with has_default_value somehow.
     return self._fields.get(field, default_value)
   getter.__module__ = None
-  getter.__doc__ = 'Getter for %s.' % proto_field_name
+  getter.__doc__ = 'Getter for {0!s}.'.format(proto_field_name)
 
   clear_when_set_to_default = is_proto3 and not field.containing_oneof
 
@@ -679,10 +676,10 @@ def _AddPropertiesForNonRepeatedScalarField(field, cls):
     setter = field_setter
 
   setter.__module__ = None
-  setter.__doc__ = 'Setter for %s.' % proto_field_name
+  setter.__doc__ = 'Setter for {0!s}.'.format(proto_field_name)
 
   # Add a property to encapsulate the getter/setter.
-  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "{0!s}" proto field.'.format(proto_field_name)
   setattr(cls, property_name, property(getter, setter, doc=doc))
 
 
@@ -717,7 +714,7 @@ def _AddPropertiesForNonRepeatedCompositeField(field, cls):
       field_value = self._fields.setdefault(field, field_value)
     return field_value
   getter.__module__ = None
-  getter.__doc__ = 'Getter for %s.' % proto_field_name
+  getter.__doc__ = 'Getter for {0!s}.'.format(proto_field_name)
 
   # We define a setter just so we can throw an exception with a more
   # helpful error message.
@@ -726,7 +723,7 @@ def _AddPropertiesForNonRepeatedCompositeField(field, cls):
                          '"%s" in protocol message object.' % proto_field_name)
 
   # Add a property to encapsulate the getter.
-  doc = 'Magic attribute generated for "%s" proto field.' % proto_field_name
+  doc = 'Magic attribute generated for "{0!s}" proto field.'.format(proto_field_name)
   setattr(cls, property_name, property(getter, setter, doc=doc))
 
 
@@ -852,8 +849,7 @@ def _AddClearFieldMethod(message_descriptor, cls):
         else:
           return
       except KeyError:
-        raise ValueError('Protocol message %s() has no "%s" field.' %
-                         (message_descriptor.name, field_name))
+        raise ValueError('Protocol message {0!s}() has no "{1!s}" field.'.format(message_descriptor.name, field_name))
 
     if field in self._fields:
       # To match the C++ implementation, we need to invalidate iterators
@@ -905,7 +901,7 @@ def _AddHasExtensionMethod(cls):
   def HasExtension(self, extension_handle):
     _VerifyExtensionHandle(self, extension_handle)
     if extension_handle.label == _FieldDescriptor.LABEL_REPEATED:
-      raise KeyError('"%s" is repeated.' % extension_handle.full_name)
+      raise KeyError('"{0!s}" is repeated.'.format(extension_handle.full_name))
 
     if extension_handle.cpp_type == _FieldDescriptor.CPPTYPE_MESSAGE:
       value = self._fields.get(extension_handle)
@@ -1026,7 +1022,7 @@ def _BytesForNonRepeatedElement(value, field_number, field_type):
     fn = type_checkers.TYPE_TO_BYTE_SIZE_FN[field_type]
     return fn(field_number, value)
   except KeyError:
-    raise message_mod.EncodeError('Unrecognized field type: %d' % field_type)
+    raise message_mod.EncodeError('Unrecognized field type: {0:d}'.format(field_type))
 
 
 def _AddByteSizeMethod(message_descriptor, cls):
@@ -1059,7 +1055,7 @@ def _AddSerializeToStringMethod(message_descriptor, cls):
     errors = []
     if not self.IsInitialized():
       raise message_mod.EncodeError(
-          'Message %s is missing required fields: %s' % (
+          'Message {0!s} is missing required fields: {1!s}'.format(
           self.DESCRIPTOR.full_name, ','.join(self.FindInitializationErrors())))
     return self.SerializePartialToString()
   cls.SerializeToString = SerializeToString
@@ -1196,7 +1192,7 @@ def _AddIsInitializedMethod(message_descriptor, cls):
     for field, value in self.ListFields():
       if field.cpp_type == _FieldDescriptor.CPPTYPE_MESSAGE:
         if field.is_extension:
-          name = "(%s)" % field.full_name
+          name = "({0!s})".format(field.full_name)
         else:
           name = field.name
 
@@ -1204,7 +1200,7 @@ def _AddIsInitializedMethod(message_descriptor, cls):
           if _IsMessageMapField(field):
             for key in value:
               element = value[key]
-              prefix = "%s[%s]." % (name, key)
+              prefix = "{0!s}[{1!s}].".format(name, key)
               sub_errors = element.FindInitializationErrors()
               errors += [prefix + error for error in sub_errors]
           else:
@@ -1213,7 +1209,7 @@ def _AddIsInitializedMethod(message_descriptor, cls):
         elif field.label == _FieldDescriptor.LABEL_REPEATED:
           for i in range(len(value)):
             element = value[i]
-            prefix = "%s[%d]." % (name, i)
+            prefix = "{0!s}[{1:d}].".format(name, i)
             sub_errors = element.FindInitializationErrors()
             errors += [prefix + error for error in sub_errors]
         else:
@@ -1277,7 +1273,7 @@ def _AddWhichOneofMethod(message_descriptor, cls):
       field = message_descriptor.oneofs_by_name[oneof_name]
     except KeyError:
       raise ValueError(
-          'Protocol message has no oneof "%s" field.' % oneof_name)
+          'Protocol message has no oneof "{0!s}" field.'.format(oneof_name))
 
     nested_field = self._oneofs.get(field, None)
     if nested_field is not None and self.HasField(nested_field.name):

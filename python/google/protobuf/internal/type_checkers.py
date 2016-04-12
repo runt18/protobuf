@@ -103,8 +103,7 @@ class TypeChecker(object):
     The returned value might have been normalized to another type.
     """
     if not isinstance(proposed_value, self._acceptable_types):
-      message = ('%.1024r has type %s, but expected one of: %s' %
-                 (proposed_value, type(proposed_value), self._acceptable_types))
+      message = ('{0:.1024!r} has type {1!s}, but expected one of: {2!s}'.format(proposed_value, type(proposed_value), self._acceptable_types))
       raise TypeError(message)
     return proposed_value
 
@@ -117,11 +116,10 @@ class IntValueChecker(object):
 
   def CheckValue(self, proposed_value):
     if not isinstance(proposed_value, six.integer_types):
-      message = ('%.1024r has type %s, but expected one of: %s' %
-                 (proposed_value, type(proposed_value), six.integer_types))
+      message = ('{0:.1024!r} has type {1!s}, but expected one of: {2!s}'.format(proposed_value, type(proposed_value), six.integer_types))
       raise TypeError(message)
     if not self._MIN <= proposed_value <= self._MAX:
-      raise ValueError('Value out of range: %d' % proposed_value)
+      raise ValueError('Value out of range: {0:d}'.format(proposed_value))
     # We force 32-bit values to int and 64-bit values to long to make
     # alternate implementations where the distinction is more significant
     # (e.g. the C++ implementation) simpler.
@@ -141,11 +139,10 @@ class EnumValueChecker(object):
 
   def CheckValue(self, proposed_value):
     if not isinstance(proposed_value, six.integer_types):
-      message = ('%.1024r has type %s, but expected one of: %s' %
-                 (proposed_value, type(proposed_value), six.integer_types))
+      message = ('{0:.1024!r} has type {1!s}, but expected one of: {2!s}'.format(proposed_value, type(proposed_value), six.integer_types))
       raise TypeError(message)
     if proposed_value not in self._enum_type.values_by_number:
-      raise ValueError('Unknown enum value: %d' % proposed_value)
+      raise ValueError('Unknown enum value: {0:d}'.format(proposed_value))
     return proposed_value
 
   def DefaultValue(self):
@@ -161,8 +158,7 @@ class UnicodeValueChecker(object):
 
   def CheckValue(self, proposed_value):
     if not isinstance(proposed_value, (bytes, six.text_type)):
-      message = ('%.1024r has type %s, but expected one of: %s' %
-                 (proposed_value, type(proposed_value), (bytes, six.text_type)))
+      message = ('{0:.1024!r} has type {1!s}, but expected one of: {2!s}'.format(proposed_value, type(proposed_value), (bytes, six.text_type)))
       raise TypeError(message)
 
     # If the value is of type 'bytes' make sure that it is valid UTF-8 data.
